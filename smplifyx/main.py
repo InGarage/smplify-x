@@ -66,6 +66,10 @@ def main(**args):
     if not osp.exists(out_img_folder):
         os.makedirs(out_img_folder)
 
+    joint_folder = osp.join(output_folder, 'joints')
+    if not osp.exists(joint_folder):
+        os.makedirs(joint_folder)    
+
     float_dtype = args['float_dtype']
     if float_dtype == 'float64':
         dtype = torch.float64
@@ -211,17 +215,22 @@ def main(**args):
         curr_mesh_folder = osp.join(mesh_folder, fn)
         if not osp.exists(curr_mesh_folder):
             os.makedirs(curr_mesh_folder)
+        curr_joint_folder = osp.join(joint_folder, fn)
+        if not osp.exists(curr_joint_folder):
+            os.makedirs(curr_joint_folder)
         for person_id in range(keypoints.shape[0]):
             if person_id >= max_persons and max_persons > 0:
                 continue
-
+            
+            curr_joint_fn = osp.join(curr_joint_folder,
+                                      '{:03d}.json'.format(person_id))
             curr_result_fn = osp.join(curr_result_folder,
                                       '{:03d}.pkl'.format(person_id))
             curr_mesh_fn = osp.join(curr_mesh_folder,
                                     '{:03d}.obj'.format(person_id))
 
             curr_img_folder = osp.join(output_folder, 'images', fn,
-                                       '{:03d}'.format(person_id))
+                                       '{:03d}'.format(person_id))                                 
             if not osp.exists(curr_img_folder):
                 os.makedirs(curr_img_folder)
 
@@ -259,6 +268,7 @@ def main(**args):
                              right_hand_prior=right_hand_prior,
                              jaw_prior=jaw_prior,
                              angle_prior=angle_prior,
+                             joint_fn= curr_joint_fn,
                              **args)
 
     elapsed = time.time() - start

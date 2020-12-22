@@ -61,6 +61,7 @@ def fit_single_frame(img,
                      result_fn='out.pkl',
                      mesh_fn='out.obj',
                      out_img_fn='overlay.png',
+                     joint_fn='out.json',
                      loss_type='smplify',
                      use_cuda=True,
                      init_joints_idxs=(9, 12, 2, 5),
@@ -496,8 +497,9 @@ def fit_single_frame(img,
                 body_pose = torch.cat([body_pose, wrist_pose], dim=1)
 
         model_output = body_model(return_verts=True, body_pose=body_pose)
+        joints = model_output.joints.detach().cpu().numpy().squeeze()
+        np.savetxt(joint_fn,joints)
         vertices = model_output.vertices.detach().cpu().numpy().squeeze()
-
         import trimesh
 
         out_mesh = trimesh.Trimesh(vertices, body_model.faces, process=False)
